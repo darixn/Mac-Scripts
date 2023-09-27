@@ -6,11 +6,14 @@ Some enviroments that require full SmartCard enforcement have no way of remind t
 Initial Window
 ![First Window](images/firstwindow.png)
 
+
 Failed Window
 ![Failed Window "User Failed Password Attempt"](images/failedwindow.png)
 
+
 Sucess Window
 ![Success Window "User Entered Correct Password"](images/successwindow.png)
+
 
 ## Requirements
 swiftDialog [link…](https://github.com/swiftDialog/swiftDialog)
