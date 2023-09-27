@@ -93,7 +93,7 @@ pass=$(echo "$passlogic" | awk -F ' : ' '{print $2}')
 	(( attempts > 3 )) && (dialog -t "$COMPANY_NAME Password Tester" --icon "$SELF_SERVICE_APP_LOGO" -p --alignment center --message "### **Apologizes** <br> <br> You've exceeded the maximum allowed incorrect password attempts. <br> <br> Try again later"  --infobox "### *Additional Info*\n\n _If you need a reset please contact our Mac Admin for assistance_"  --button1text "Close") && exit 0
     fi
 done
-(dialog -t "$COMPANY_NAME Password Tester" --icon "$SELF_SERVICE_APP_LOGO" -p --alignment center --message "### **Congratulations** <br> <br> You've entered the correct password. <br>Thank you" --infobox "### Please Note:\n\n _For security purposes, Passwords must be reset every $MAX_PASSWORD_AGE days_" --button1text "Close" &>/dev/null )  
+(dialog -t "$COMPANY_NAME Password Tester" --icon "$SELF_SERVICE_APP_LOGO" -p --alignment center --message "### **Congratulations** <br> <br> You've entered the correct password. <br>Thank you" --infobox "### *Please Note*:\n\n _For security purposes, Passwords must be reset every $MAX_PASSWORD_AGE days_" --button1text "Close" &>/dev/null )  
 
 exit 0
 
