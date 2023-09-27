@@ -75,7 +75,7 @@ until dscl . authonly "$user" "$pass" &>/dev/null ; do
 	# lines 9 and 10 are only necessary if you wish to display no. of attempts remaining before failure
 	attemptsRemaining=$(( 4 - attempts ))
 	[[ $attemptsRemaining -eq 1 ]] && s= || s=s
-passlogic=$(dialog -t "$COMPANY_NAME" --icon "$SELF_SERVICE_APP_LOGO" -p --alignment center --message "Sorry, you've entered an incorrect password, please try again.<br><br>_("$attemptsRemaining" attempt"$s" remaining*)_" --infobox "### *Please Note*:\n\n_*Reattempts do not count towards your lockout limit_" --textfield "Authenticate with Local Password",secure --button1text "Enter Local Password to Continue" --button2text "Not Now")
+passlogic=$(dialog -t "$COMPANY_NAME Password Tester" --icon "$SELF_SERVICE_APP_LOGO" -p --alignment center --message "Sorry, you've entered an incorrect password, please try again.<br><br>_("$attemptsRemaining" attempt"$s" remaining*)_" --infobox "### *Please Note*:\n\n_*Reattempts do not count towards your lockout limit_" --textfield "Authenticate with Local Password",secure --button1text "Enter Local Password to Continue" --button2text "Not Now")
 
 #Process if User Presses "Not Now"
 if [ $? -eq 2 ]; then
