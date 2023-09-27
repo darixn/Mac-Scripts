@@ -17,4 +17,5 @@ Sucess Window
 
 ## Requirements
 swiftDialog [link…](https://github.com/swiftDialog/swiftDialog)
+<br>
 MDM Deployment [Jamf Pro]
