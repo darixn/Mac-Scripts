@@ -8,14 +8,16 @@
 #
 # See Link for SwiftDialog: https://github.com/swiftDialog/swiftDialog
 #
+#  https://github.com/cocopuff2u
+#
 ####################################################################################################
 # 
 # HISTORY
 #
-# 1.0 8/21/23 - Original Release - Cody K
+# 1.0 8/21/23 - Original Release - @cocopuff2u
 #
 #
-# 1.2 9/13/23 - Covered from AppleScript over to SwiftDialog, added logic for current password, added ability to "Not Now" Prompt and added a FailedLoginCount to reset back to zero on failed attempts - Cody K
+# 1.2 9/13/23 - Covered from AppleScript over to SwiftDialog, added logic for current password, added ability to "Not Now" Prompt and added a FailedLoginCount to reset back to zero on failed attempts - @cocopuff2u
 #
 #
 #
