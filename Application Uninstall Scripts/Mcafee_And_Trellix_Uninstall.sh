@@ -12,7 +12,7 @@
 # 
 # HISTORY
 #
-# 1.0 8/29/23 - I took the two following scripts below and combined them to cleanboth Mcfee & Trellix - @cocopuff2u
+# 1.0 8/29/23 - I took the two following scripts below and combined them to clean both Mcafee & Trellix - @cocopuff2u
 # (https://gist.github.com/sdagley/566dddd0b497dfe05fb487abaa274024#file-ripoff-mcafee-v2-3-sh)
 # (https://github.com/rtrouton/rtrouton_scripts/blob/main/rtrouton_scripts/uninstallers/trellix_uninstall/Trellix_Uninstall.sh)
 #
