@@ -17,7 +17,7 @@
 # 1.0 8/21/23 - Original Release - @cocopuff2u
 #
 #
-# 1.2 9/13/23 - Covered from AppleScript over to SwiftDialog, added logic for current password, added ability to "Not Now" Prompt and added a FailedLoginCount to reset back to zero on failed attempts - @cocopuff2u
+# 1.2 9/13/23 - Converted from AppleScript over to SwiftDialog, added logic for current password, added ability to "Not Now" Prompt and added a FailedLoginCount to reset back to zero on failed attempts - @cocopuff2u
 #
 #
 #
