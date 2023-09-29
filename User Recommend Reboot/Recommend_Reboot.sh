@@ -6,14 +6,15 @@
 #
 # Purpose: Encourages the user to reboot after reaching maximum set uptime
 #
+# https://github.com/cocopuff2u
 #
 ####################################################################################################
 # 
 # HISTORY
 #
-# 1.0 5/30/23 - Master Release - Cody K
+# 1.0 5/30/23 - Master Release - @cocopuff2u
 #
-# 1.1 8/28/23 - Adjusted variable locations in the script - Cody K
+# 1.1 8/28/23 - Adjusted variable locations in the script - @cocopuff2u
 #
 #
 ####################################################################################################
