@@ -10,6 +10,14 @@ If you have questions or ideas reach out to me on the Mac Admins Slack channel, 
 
 ## Scripts
 
+
+### <p align="center"> [Encourager MacOS Upgrade Script](https://github.com/cocopuff2u/Jamf-Scripts/tree/aed85f88d759b35859bd2603e6ee099794a01680/Encourager%20(MacOS%20Upgrader%20Script))  </p> 
+<p align="center"> This is designed to help you push MacOS Upgrade via Install Assistant pkg, encouraging a user to do the upgrade </p> 
+<br />
+<p align="center">
+<img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/440682a92426b6de0611e3156271bcb685b70525/Encourager%20(MacOS%20Upgrader%20Script)/images/firstwindow.png" width=50% height=50%>
+</p>
+
 ### <p align="center"> [User Password Tester](https://github.com/cocopuff2u/Jamf-Scripts/tree/main/User%20Password%20Tester)  </p> 
 <p align="center"> This is designed to have the local logged in user test there password (great for SmartCard enforced environments) </p> 
 <br />
