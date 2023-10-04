@@ -18,3 +18,5 @@ Note: Currently set for the password to change every 60 days and the user to be 
 <img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/e180c6ff51823ef44a81a8d22f471d1d95888035/Password%20Expiring%20Warning/images/firstwindow.png">
 
 
+### Self Service Window
+<img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/9bb2ea4cc5f0a96f64a3c8e837a33aa357551718/Password%20Expiring%20Warning/images/selfservicewindow.png">
