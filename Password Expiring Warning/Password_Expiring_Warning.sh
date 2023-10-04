@@ -88,7 +88,7 @@ if [ "13" -gt "$currentmacosversion" ]; then
         elif [ "$TIME_TO_CHANGE" -lt 0 ];
         then
                 echo "The password for $user has expired!"	
-                launchctl asuser "$getUID" /usr/bin/osascript -e 'Tell current application to display dialog "Your password has expired! Attempt to change your password or contact the RDTE Helpdesk for help"' 
+                launchctl asuser "$getUID" /usr/bin/osascript -e 'Tell current application to display dialog "Your password has expired! Attempt to change your password or contact the Mac Administrator for help"' 
         fi
 else
         echo "Users MacOS is greater than Ventura"
