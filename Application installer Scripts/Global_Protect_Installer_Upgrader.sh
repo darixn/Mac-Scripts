@@ -134,7 +134,7 @@ fi
 
 # Clean up the temporary directory
 updateScriptLog "GPAutoUpdater: Cleaning up the files"
-#rm -rf "$gp_temp_dir"
+rm -rf "$gp_temp_dir"
 
 updateScriptLog "GPAutoUpdater: Script Complete"
 exit 0
