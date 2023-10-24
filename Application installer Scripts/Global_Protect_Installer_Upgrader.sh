@@ -56,6 +56,7 @@ CURRENT_USER=`ls -l /dev/console | awk '{ print $3 }'`
 
 # Create a temporary directory to expand the package
 gp_temp_dir=$(mktemp -d)
+updateScriptLog "GPAutoUpdater: Temporary folder made $gp_temp_dir"
 
 # Replace 'path/to/your/file.txt' with the actual path of the file you want to check
 GP_file_path="/Applications/GlobalProtect.app/"
@@ -90,15 +91,15 @@ pkgutil --expand "$gp_pkg_file" "$gp_temp_dir/expanded_package"
 
 # Find and extract the version information from the server
 gp_downloaded_version_info=$(cat "$gp_temp_dir/expanded_package/Distribution" | grep -o '<bundle CFBundleShortVersionString="[^"]*"' | head -n 1 | awk -F '"' '{print $2}')
-gp_downloaded_version_info_hyphen=$(echo $gp_downloaded_version_info | sed 's/-//g' )
+gp_downloaded_version_info_hyphen=$(cat "$gp_temp_dir/expanded_package/Distribution" | grep -o '<bundle CFBundleShortVersionString="[^"]*"' | head -n 1 | awk -F '"' '{print $2}' | sed 's/-//g')
 
 #Find local version information
 gp_verison_info=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString)
-gp_version_info_hyphen=$($gp_version_info | sed 's/-//g')
+gp_version_info_hyphen=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString | sed 's/-//g')
 
 if [ -d "$GP_file_path" ]; then
-updateScriptLog "GPAutoUpdater: Local GP Version - $gp_verison_info"
-updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info"
+updateScriptLog "GPAutoUpdater: Local GP Version - $gp_version_info_hyphen"
+updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info_hyphen"
     if [[ "$gp_downloaded_version_info_hyphen" < "$gp_version_info_hyphen" ]]; then
         # Your action(s) here if the server version is newer
         updateScriptLog "GPAutoUpdater: Upgrading from GP Version $gp_version_info to Server GP Version $gp_downloaded_version_info"
@@ -113,7 +114,7 @@ updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info"
         #reload system from starting right after boot, fixing the hang
         sudo -u "$CURRENT_USER" launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
         else
-        updateScriptLog "GPAutoUpdater: $gp_verison_info and Server GP Version: $gp_downloaded_version_info match or not greater"
+        updateScriptLog "GPAutoUpdater: Local GP Version: $gp_verison_info and Server GP Version: $gp_downloaded_version_info match or not greater"
     fi
 
 else
@@ -133,7 +134,8 @@ fi
 
 # Clean up the temporary directory
 updateScriptLog "GPAutoUpdater: Cleaning up the files"
-rm -rf "$gp_temp_dir"
+#rm -rf "$gp_temp_dir"
 
 updateScriptLog "GPAutoUpdater: Script Complete"
 exit 0
+
