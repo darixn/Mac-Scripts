@@ -90,7 +90,7 @@ pkgutil --expand "$gp_pkg_file" "$gp_temp_dir/expanded_package"
 
 # Find and extract the version information from the server
 gp_downloaded_version_info=$(cat "$gp_temp_dir/expanded_package/Distribution" | grep -o '<bundle CFBundleShortVersionString="[^"]*"' | head -n 1 | awk -F '"' '{print $2}')
-gp_downloaded_version_info_hyphen=$(updateScriptLog $gp_downloaded_version_info | sed 's/-//g' )
+gp_downloaded_version_info_hyphen=$(echo $gp_downloaded_version_info | sed 's/-//g' )
 
 #Find local version information
 gp_verison_info=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString)
