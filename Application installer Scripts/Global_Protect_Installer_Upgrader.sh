@@ -152,8 +152,27 @@ compare_versions() {
     fi
 }
 
-# Call the function to compare versions
-compare_versions "$gp_version_info_hyphen" "$gp_downloaded_version_info_hyphen"
+# See if GP is installed, if 
+if [ -d "$GP_file_path" ]; then
+    # Call the function to compare versions
+        compare_versions "$gp_version_info_hyphen" "$gp_downloaded_version_info_hyphen"
+    else
+        updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info"
+        updateScriptLog "GPAutoUpdater: Local GP not present on the device"
+        updateScriptLog "GPAutoUpdater: Running GP installer"
+        #Installing SecureConnector as a Daemon/Dissolvable w/ visible/invisible menu bar icon
+        sudo installer -pkg $gp_pkg_file -target /
+        updateScriptLog "GPAutoUpdater: $gp_downloaded_version_info version installed"
+        updateScriptLog "GPAutoUpdater: Restarting services to reflect changes"
+
+        #unload system from starting right after boot, causes a hang on the service
+        sudo -u "$CURRENT_USER" launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
+
+        sleep 3
+        #reload system from starting right after boot, fixing the hang
+        sudo -u "$CURRENT_USER" launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
+fi
+
 
 # Clean up the temporary directory
 updateScriptLog "GPAutoUpdater: Cleaning up the files"
