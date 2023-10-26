@@ -15,6 +15,8 @@
 #
 #  1.1 10/24/24 - Added the the ability to compare the local with the server version and upgrade if needed
 #
+#  1.2 10/26/24 - Added a better logic for comparing
+#
 ####################################################################################################
 
 
@@ -69,11 +71,11 @@ http_status_code=$(curl -s -o /dev/null -w "%{http_code}" "$GP_pkg_url_live")
 
 # Confirm URL is live
 if [ "$http_status_code" -eq 200 ]; then
-    updateScriptLog "GPAutoUpdater: url looks live for $GP_pkg_url_live"
-    updateScriptLog "GPAutoUpdater: attempting to download file from $GP_pkg_url"
+    updateScriptLog "GPAutoUpdater: URL looks live for $GP_pkg_url_live"
+    updateScriptLog "GPAutoUpdater: Attempting to download file from $GP_pkg_url"
     # Download PKG File from URL
     if curl "$GP_pkg_url" -o "$gp_pkg_file" ; then
-        updateScriptLog "GPAutoUpdater: downloaded file from $GP_pkg_url_live"
+        updateScriptLog "GPAutoUpdater: Downloaded file from $GP_pkg_url_live"
         else
         updateScriptLog "GPAutoUpdater: Unable to download file from $GP_pkg_url_live"
         updateScriptLog "GPAutoUpdater: Script Exited"
@@ -94,43 +96,64 @@ gp_downloaded_version_info=$(cat "$gp_temp_dir/expanded_package/Distribution" | 
 gp_downloaded_version_info_hyphen=$(cat "$gp_temp_dir/expanded_package/Distribution" | grep -o '<bundle CFBundleShortVersionString="[^"]*"' | head -n 1 | awk -F '"' '{print $2}' | sed 's/-//g')
 
 #Find local version information
-gp_verison_info=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString)
+gp_version_info=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString)
 gp_version_info_hyphen=$(defaults read /Applications/GlobalProtect.app/Contents/Info.plist CFBundleShortVersionString | sed 's/-//g')
 
-if [ -d "$GP_file_path" ]; then
-updateScriptLog "GPAutoUpdater: Local GP Version - $gp_version_info_hyphen"
-updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info_hyphen"
-    if [[ "$gp_downloaded_version_info_hyphen" < "$gp_version_info_hyphen" ]]; then
+#!/bin/bash
+
+# Function to compare two version strings
+compare_versions() {
+    local v1=(${1//./ })
+    local v2=(${2//./ })
+    updateScriptLog "GPAutoUpdater: Local GP Version - $gp_version_info_hyphen"
+    updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info_hyphen"
+
+    for ((i = 0; i < ${#v1[@]}; i++)); do
+        if [[ ${v1[i]} -lt ${v2[i]} ]]; then
+            # Your action(s) here if the server version is newer
+            updateScriptLog "GPAutoUpdater: Upgrading from GP Version $gp_version_info to Server GP Version $gp_downloaded_version_info"
+            updateScriptLog "GPAutoUpdater: Running GP installer"
+            #Installing SecureConnector as a Daemon/Dissolvable w/ visible/invisible menu bar icon
+            sudo installer -pkg $gp_pkg_file -target /
+            updateScriptLog "GPAutoUpdater: $gp_downloaded_version_info version installed"
+            updateScriptLog "GPAutoUpdater: Restarting services to reflect changes"
+            #unload system from starting right after boot, causes a hang on the service
+            sudo -u "$CURRENT_USER" launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
+
+            sleep 3
+            #reload system from starting right after boot, fixing the hang
+            sudo -u "$CURRENT_USER" launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
+            return
+        elif [[ ${v1[i]} -gt ${v2[i]} ]]; then
+            updateScriptLog "GPAutoUpdater: Local GP Version $gp_version_info is newer Server GP Version $gp_downloaded_version_info"
+            return
+        fi
+    done
+
+    if [[ ${#v1[@]} -lt ${#v2[@]} ]]; then
         # Your action(s) here if the server version is newer
         updateScriptLog "GPAutoUpdater: Upgrading from GP Version $gp_version_info to Server GP Version $gp_downloaded_version_info"
-
+        updateScriptLog "GPAutoUpdater: Running GP installer"
         #Installing SecureConnector as a Daemon/Dissolvable w/ visible/invisible menu bar icon
         sudo installer -pkg $gp_pkg_file -target /
-
+        updateScriptLog "GPAutoUpdater: New GP installed"
+        updateScriptLog "GPAutoUpdater: Restarting services to reflect changes"
         #unload system from starting right after boot, causes a hang on the service
         sudo -u "$CURRENT_USER" launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
 
         sleep 3
         #reload system from starting right after boot, fixing the hang
         sudo -u "$CURRENT_USER" launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
-        else
-        updateScriptLog "GPAutoUpdater: Local GP Version: $gp_verison_info and Server GP Version: $gp_downloaded_version_info match or not greater"
+    elif [[ ${#v1[@]} -gt ${#v2[@]} ]]; then
+        updateScriptLog "GPAutoUpdater: Local GP Version $gp_version_info is newer Server GP Version $gp_downloaded_version_info"
+        updateScriptLog "GPAutoUpdater: Doing nothing to change the local version"
+    else
+        updateScriptLog "GPAutoUpdater: Local GP Version $gp_version_info is the same as Server GP Version $gp_downloaded_version_info"
     fi
+}
 
-else
-updateScriptLog "GPAutoUpdater: Server GP Version - $gp_downloaded_version_info"
-updateScriptLog "GPAutoUpdater: Local GP not present on the device"
-updateScriptLog "GPAutoUpdater: Installing"
-#Installing SecureConnector as a Daemon/Dissolvable w/ visible/invisible menu bar icon
-sudo installer -pkg $gp_pkg_file -target /
-
-#unload system from starting right after boot, causes a hang on the service
-sudo -u "$CURRENT_USER" launchctl unload /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
-
-sleep 3
-#reload system from starting right after boot, fixing the hang
-sudo -u "$CURRENT_USER" launchctl load /Library/LaunchAgents/com.paloaltonetworks.gp.pangp*
-fi
+# Call the function to compare versions
+compare_versions "$gp_version_info_hyphen" "$gp_downloaded_version_info_hyphen"
 
 # Clean up the temporary directory
 updateScriptLog "GPAutoUpdater: Cleaning up the files"
