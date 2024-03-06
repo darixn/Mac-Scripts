@@ -177,7 +177,7 @@ exit_status=$(
     --button2 \
     --button2text "$button1" \
     --selecttitle "Select below the amount of loop cycles:",radio \
-    --selectvalues "5 Loops, 10 Loops, 20 Loops, 50 Loops" \
+    --selectvalues "5 Loops, 10 Loops, 20 Loops, 60 Loops" \
     --helpmessage "$helpmessage" \ | grep "SelectedOption" | awk -F ": " '{print $NF}'
 )
 
@@ -191,8 +191,8 @@ elif [[ $exit_status == *20* ]]; then
     updateScriptLog "Trellix Loop Updates: User selected 20 loops...."
     iterations=20
 elif [[ $exit_status == *50* ]]; then
-    updateScriptLog "Trellix Loop Updates: User selected 50 loops...."
-    iterations=50
+    updateScriptLog "Trellix Loop Updates: User selected 60 loops...."
+    iterations=60
 else
     updateScriptLog "Trellix Loop Updates: User selected exit or timed-out"
     exit 0
