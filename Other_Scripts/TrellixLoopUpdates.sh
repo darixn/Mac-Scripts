@@ -16,6 +16,8 @@
 #
 #  1.1 03/06/24 - Gave the user a selective prompt for various loops, fixed logging, and icon check
 #
+#  1.2 03/20/24 - Fixed loop for 60
+#
 ####################################################################################################
 
 # Path to our dialog binary
