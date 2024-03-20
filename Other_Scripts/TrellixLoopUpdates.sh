@@ -190,7 +190,7 @@ elif [[ $exit_status == *10* ]]; then
 elif [[ $exit_status == *20* ]]; then
     updateScriptLog "Trellix Loop Updates: User selected 20 loops...."
     iterations=20
-elif [[ $exit_status == *50* ]]; then
+elif [[ $exit_status == *60* ]]; then
     updateScriptLog "Trellix Loop Updates: User selected 60 loops...."
     iterations=60
 else
