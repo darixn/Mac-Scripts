@@ -57,7 +57,7 @@ done
 
 # If there are missing certificates, display a dialog and exit
 if [ ! -z "$missing_certs" ]; then
-    message="The following certificate(s) are missing from the system keychain:\n\n${missing_certs}\nPlease correct this before proceeding. Inside RDT&E Self Service install DOD Certificates then rerun this."
+    message="The following certificate(s) are missing from the system keychain:\n\n${missing_certs}\nPlease correct this before proceeding. Install DoD Certs into the System keychain then rerun this."
     display_dialog "${message}"
     exit 0
 fi
