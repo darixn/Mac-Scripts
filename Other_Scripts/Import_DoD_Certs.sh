@@ -149,7 +149,7 @@ else
 fi
 
 osascript -e 'display notification "Completed Import of all Certificates" with title "Certificate Import Complete"'
-sleepd 5
+sleep 5
 # Remove all downloaded files
 rm -rf "$FULL_FOLDER_PATH"
 
