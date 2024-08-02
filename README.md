@@ -10,6 +10,11 @@ If you have questions or ideas reach out to me on the Mac Admins Slack channel, 
 
 ## Scripts
 
+### <p align="center"> [Password Expiring Warning](https://github.com/cocopuff2u/Jamf-Scripts/tree/e9726a40ae3d0c85901b81bdebf9cfaee3eff9c3/Password%20Expiring%20Warning) </p> 
+<p align="center"> Warns the user of a password expiring soon </p> 
+<p align="center">
+<img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/e180c6ff51823ef44a81a8d22f471d1d95888035/Password%20Expiring%20Warning/images/firstwindow.png">
+</p>
 
 ### <p align="center"> [Encourager MacOS Upgrade Script](https://github.com/cocopuff2u/Jamf-Scripts/tree/aed85f88d759b35859bd2603e6ee099794a01680/Encourager%20(MacOS%20Upgrader%20Script))  </p> 
 <p align="center"> This is designed to help you push MacOS Upgrade via Install Assistant pkg, encouraging a user to do the upgrade </p> 
@@ -35,10 +40,4 @@ If you have questions or ideas reach out to me on the Mac Admins Slack channel, 
 <p align="center"> This is designed let users select a time zone </p> 
 <p align="center">
 <img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/84457f9da900fc5f54a5968825ab2b1fd96dfdf9/Set%20Time%20Zone/firstwindow.png">
-</p>
-
-### <p align="center"> [Password Expiring Warning](https://github.com/cocopuff2u/Jamf-Scripts/tree/e9726a40ae3d0c85901b81bdebf9cfaee3eff9c3/Password%20Expiring%20Warning) </p> 
-<p align="center"> Warns the user of a password expiring soon </p> 
-<p align="center">
-<img src="https://github.com/cocopuff2u/Jamf-Scripts/blob/e180c6ff51823ef44a81a8d22f471d1d95888035/Password%20Expiring%20Warning/images/firstwindow.png">
 </p>
