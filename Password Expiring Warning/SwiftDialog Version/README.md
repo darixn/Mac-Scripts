@@ -1,4 +1,4 @@
-# Password Expiring Warning Script (with OSAScript)
+# Password Expiring Warning Script (with SwiftDialog)
 
 Leverages `SwiftDialog` and Jamf Pro Scripts to easily displays a simple window encouraging the end-user change the password for there account before the expired date. If the user decides to change it, it will open the system preference change password window
 <br />
