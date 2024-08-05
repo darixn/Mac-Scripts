@@ -14,7 +14,8 @@
 #   History
 #
 #  1.0 7/28/24 - Original (Learned from https://github.com/usnistgov/macos_security?tab=readme-ov-file)
-#  1.1 7/31/24 - Added support to hide Nonchip supported commands or run/show them
+#  1.1 8/01/24 - Added support to hide Nonchip supported commands or run/show them
+#  1.2 8/05/24 - Added support for plist logging
 #
 ####################################################################################################
 # Script Supported STIG Version
@@ -24,15 +25,17 @@ STIG_VERSION="MACOS 14 (SONOMA) V2R1" # [ Do Not Adjust ]
 CURRENT_USER=$( /usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }' )
 
 # Script Log Location [ /var/log/yourcompany_Passed_STIG_Scan.log ]
-PASS_LOG_FILE="/Users/$CURRENT_USER/Desktop/Passed_STIG_Scan.log"
-FAILURE_LOG_FILE="/Users/$CURRENT_USER/Desktop/Failed_STIG_Scan.log"
-SINGLE_LOG_FILE="/Users/$CURRENT_USER/Desktop/Complete_STIG_Scan.log" 
-COMMAND_LOG_FILE="/Users/$CURRENT_USER/Desktop/Command_STIG.log"  
+PASS_LOG_FILE="/var/log/Passed_STIG_Scan.log"
+FAILURE_LOG_FILE="/var/log/Failed_STIG_Scan.log"
+SINGLE_LOG_FILE="/var/log/Complete_STIG_Scan.log" 
+COMMAND_LOG_FILE="/var/log/Command_STIG.log"
+PLIST_FILE="/Library/Preferences/STIG_Checks.plist"
 
 # Default values for logs
 CLEAR_LOGS=true # Clears existing local logs before running [ true (default) | false ] )
 LOG_TO_SINGLE_FILE=false # Logs failures & passes in one log file [ true | false (default) ]
 LOG_COMMANDS=true # Shows the commands input and output in a log file, *PERFECT FOR FILLING OUT STIG CHECKS* [ true (default) | false ]
+LOG_TO_PLIST=false # logs failures & passes to a plist file [ true  | false (default) ]
 HIDE_RESULTS_IN_TERMINAL=true # Show output in terminal when running script local [ true (default) | false ]
 HIDE_NONCHIP_SUPPORTED_COMMANDS=true # Only runs commands supported on this hardware [ true (default) | false ] 
 
@@ -103,6 +106,38 @@ if [ "$CLEAR_LOGS" = true ]; then
         fi
     fi
 fi
+
+# Function to initialize the plist file
+initialize_plist() {
+    echo '<?xml version="1.0" encoding="UTF-8"?>' > "$PLIST_FILE"
+    echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> "$PLIST_FILE"
+    echo '<plist version="1.0">' >> "$PLIST_FILE"
+    echo '<dict>' >> "$PLIST_FILE"
+    echo '</dict>' >> "$PLIST_FILE"
+    echo '</plist>' >> "$PLIST_FILE"
+}
+
+initialize_plist
+
+# Function to update the plist file with a check result
+update_plist() {
+    local check_name=$1
+    local simple_name=$2
+    local boolean_result=$3
+
+    # Create a temporary plist file for processing
+    local temp_plist="/var/log/STIG_Checks_temp.plist"
+
+    # Extract the existing plist content
+    /usr/libexec/PlistBuddy -x -c "Print" "$PLIST_FILE" > "$temp_plist"
+
+    # Update the plist with the new check result
+    /usr/libexec/PlistBuddy -c "Add :$check_name\_$simple_name dict" "$temp_plist"
+    /usr/libexec/PlistBuddy -c "Add :$check_name\_$simple_name:finding bool $boolean_result" "$temp_plist"
+
+    # Replace the original plist file with the updated one
+    mv "$temp_plist" "$PLIST_FILE"
+}
 
 # Function to add date header to log files
 add_date_header_combined() {
@@ -180,6 +215,7 @@ log_result() {
     # Append the log message to the appropriate file with a timestamp
     echo "$check_name: $result$( [ "$HIDE_NONCHIP_SUPPORTED_COMMANDS" = false ] && [ -n "$chip_specific" ] && echo " (Chip Specific: $chip_specific)" )" >> "$log_file"
 
+
     if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
     echo "Logged result output to $log_file"
     echo "Results: $check_name: $result"
@@ -241,8 +277,15 @@ execute_and_log() {
     # Determine the result and log it
     if [ "$result_output" = "$expected_result" ]; then
         result="Passed"
+        boolean_result="false"
     else
         result="Failed"
+        boolean_result="true"
+    fi
+
+    # Log to plist file
+    if [ "$LOG_TO_PLIST" = true ]; then
+    update_plist "$check_name" "$simple_name" "$boolean_result"
     fi
 
     log_result "$check_name ($simple_name)" "$result"
@@ -266,12 +309,19 @@ execute_and_log_chip_specific() {
       # Log the command output
       log_command_output "$check_name" "$command" "$result_output" "$expected_result" "$simple_name" "$chip_specific"
 
-      # Determine the result and log it
-      if [ "$result_output" = "$expected_result" ]; then
-          result="Passed"
-      else
-          result="Failed"
-      fi
+    # Determine the result and log it
+    if [ "$result_output" = "$expected_result" ]; then
+        result="Passed"
+        boolean_result="false"
+    else
+        result="Failed"
+        boolean_result="true"
+    fi
+
+        # Log to plist file
+        if [ "$LOG_TO_PLIST" = true ]; then
+        update_plist "$check_name" "$simple_name" "$boolean_result"
+        fi
       
       log_result "$check_name ($simple_name)" "$result" "$chip_specific"
     else
@@ -289,8 +339,15 @@ execute_and_log_chip_specific() {
         # Determine the result and log it
         if [ "$result_output" = "$expected_result" ]; then
             result="Passed"
+            boolean_result="false"
         else
             result="Failed"
+            boolean_result="true"
+        fi
+
+        # Log to plist file
+        if [ "$LOG_TO_PLIST" = true ]; then
+        update_plist "$check_name" "$simple_name" "$boolean_result"
         fi
         
         log_result "$check_name ($simple_name)" "$result" "$chip_specific"
@@ -314,8 +371,15 @@ execute_anyresult_and_log() {
     # Determine the result and log it
     if [ -n "$result_output" ]; then
         result="Passed"
+        boolean_result="false"
     else
         result="Failed"
+        boolean_result="true"
+    fi
+
+    # Log to plist file
+    if [ "$LOG_TO_PLIST" = true ]; then
+    update_plist "$check_name" "$simple_name" "$boolean_result"
     fi
 
     log_result "$check_name $simple_name" "$result"
