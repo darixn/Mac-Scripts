@@ -73,13 +73,13 @@ CURRENT_USER=$( /usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/
 if [ -t 1 ]; then
     # Basic Colors
     BLACK=$(tput setaf 0)
-    BLUE=$(tput setaf 4)
+    BLUE=$(tput setaf 27)
     CYAN=$(tput setaf 6)
-    GREEN=$(tput setaf 2)
+    GREEN=$(tput setaf 10)
     MAGENTA=$(tput setaf 5)
-    RED=$(tput setaf 1)
+    RED=$(tput setaf 9)
     RESET=$(tput sgr0)
-    WHITE=$(tput setaf 7)
+    WHITE=$(tput setaf 15)
     YELLOW=$(tput setaf 3)
 
     # Extended Colors
@@ -91,7 +91,7 @@ if [ -t 1 ]; then
     LIGHT_YELLOW=$(tput setaf 11)
 
     # 256 colors (example with some specific colors)
-    COLOR_16=$(tput setaf 16) # Dark grey
+    COLOR_16=$(tput setaf 8) # Dark grey
     COLOR_82=$(tput setaf 82) # Light green
     COLOR_208=$(tput setaf 208) # Orange
     COLOR_75=$(tput setaf 75) # Light teal
