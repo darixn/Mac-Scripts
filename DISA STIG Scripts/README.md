@@ -8,6 +8,17 @@ Each Script will have variables that need to be adjusted to generate logs locall
 <br />
 I've included the import DoD Certifcates script in here too, this will help import the required DoD certifcates into the system keychain
 <br />
+### <p align="center"> <ins> Executing Scripts</ins> </p>
+
+```
+sudo bash "PATH/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
+```
+<br />
+* <strong>Note:</strong> The file path will depend on where you downloaded the file. For example, if it was saved to the Downloads folder in your home directory, the command would look like this:
+
+```
+sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
+``` 
 
 ## <p align="center"> [Sonoma STIG Checker](https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20CHECKER.sh) </p> 
 <p align="center"> Script checks the required DISA STIGS against the machines current settings and logs the information for the admin. The logs are located in the /var/log/* folder unless changed in the script.</p>
