@@ -10,8 +10,6 @@
 #
 # https://github.com/cocopuff2u
 #
-# Created by cody.m.keats.civ@us.navy.mil
-#
 ####################################################################################################
 #
 #   History
@@ -24,7 +22,7 @@
 STIG_VERSION="MACOS 14 (SONOMA) V2R1" # [ Do Not Adjust ]
 
 # Script Log Location [ /var/log/yourcompany_Passed_STIG_Scan.log ]
-COMMAND_LOG_FILE="/Users/keatscm/Desktop/Command_STIG.log"
+COMMAND_LOG_FILE="/var/log/fix_Command_STIG.log"
 LOG_COMMANDS=true # Shows the commands input and output in a log file, * Passed checks dont have input/output * [ true (default) | false ]
 ONLY_SHOW_FAILED=true # Hides passed checks [ true (default) | false ]
 
