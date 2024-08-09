@@ -16,13 +16,14 @@
 #  1.0 7/28/24 - Original (Learned from https://github.com/usnistgov/macos_security?tab=readme-ov-file)
 #  1.1 8/01/24 - Added support to hide Nonchip supported commands or run/show them
 #  1.2 8/05/24 - Added support for plist logging
+#  1.3 8/07/24 - Fix check for V-259427
+#  1.4 8/08/24 - Moved current user below adjustable variables and added 2>/dev/null to clean up
+#  noise in terminal *result_output=$(eval "$command" 2>/dev/null)*
+#  1.5 8/9/24 - Adjusted logging in terminal and file
 #
 ####################################################################################################
 # Script Supported STIG Version
 STIG_VERSION="MACOS 14 (SONOMA) V2R1" # [ Do Not Adjust ]
-
-# Pulls Current User
-CURRENT_USER=$( /usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }' )
 
 # Script Log Location [ /var/log/yourcompany_Passed_STIG_Scan.log ]
 PASS_LOG_FILE="/var/log/Passed_STIG_Scan.log"
@@ -36,8 +37,9 @@ CLEAR_LOGS=true # Clears existing local logs before running [ true (default) | f
 LOG_TO_SINGLE_FILE=false # Logs failures & passes in one log file [ true | false (default) ]
 LOG_COMMANDS=true # Shows the commands input and output in a log file, *PERFECT FOR FILLING OUT STIG CHECKS* [ true (default) | false ]
 LOG_TO_PLIST=false # logs failures & passes to a plist file [ true  | false (default) ]
-HIDE_RESULTS_IN_TERMINAL=true # Show output in terminal when running script local [ true (default) | false ]
-HIDE_NONCHIP_SUPPORTED_COMMANDS=true # Only runs commands supported on this hardware [ true (default) | false ] 
+HIDE_RESULTS_IN_TERMINAL=false # Show output in terminal when running script local [ true | false (default) ]
+HIDE_NONCHIP_SUPPORTED_COMMANDS=true # Only runs commands supported on this hardware [ true (default) | false ]
+MAKE_TERMINAL_COLORFUL=true # Gives terminal color for the outputs * Requires HIDE_RESULTS_IN_TERMINAL=false * [ true (default) | false ]
 
 ####################################################################################################
 #
@@ -58,6 +60,188 @@ else
   device_chip="Intel"
 fi
 
+# Pulls Current User
+CURRENT_USER=$( /usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }' )
+
+####################################################################################################
+#
+# Making Some Colors
+#
+####################################################################################################
+
+# Check if terminal supports colors
+if [ -t 1 ]; then
+    # Basic Colors
+    BLACK=$(tput setaf 0)
+    BLUE=$(tput setaf 4)
+    CYAN=$(tput setaf 6)
+    GREEN=$(tput setaf 2)
+    MAGENTA=$(tput setaf 5)
+    RED=$(tput setaf 1)
+    RESET=$(tput sgr0)
+    WHITE=$(tput setaf 7)
+    YELLOW=$(tput setaf 3)
+
+    # Extended Colors
+    ORANGE=$(tput setaf 202)
+    LIGHT_BLUE=$(tput setaf 12)
+    LIGHT_GREEN=$(tput setaf 10)
+    LIGHT_CYAN=$(tput setaf 14)
+    LIGHT_MAGENTA=$(tput setaf 13)
+    LIGHT_YELLOW=$(tput setaf 11)
+
+    # 256 colors (example with some specific colors)
+    COLOR_16=$(tput setaf 16) # Dark grey
+    COLOR_82=$(tput setaf 82) # Light green
+    COLOR_208=$(tput setaf 208) # Orange
+    COLOR_75=$(tput setaf 75) # Light teal
+    COLOR_123=$(tput setaf 123) # Light purple
+    COLOR_226=$(tput setaf 226) # Light yellow
+    COLOR_55=$(tput setaf 55) ## dark purple
+
+    # Formatting
+    BOLD=$(tput bold)
+    UNDERLINE=$(tput smul)
+    REVERSE=$(tput rev)
+else
+    BLACK=""
+    RED=""
+    GREEN=""
+    YELLOW=""
+    BLUE=""
+    MAGENTA=""
+    CYAN=""
+    WHITE=""
+    RESET=""
+    ORANGE=""
+    LIGHT_BLUE=""
+    LIGHT_GREEN=""
+    LIGHT_CYAN=""
+    LIGHT_MAGENTA=""
+    LIGHT_YELLOW=""
+    COLOR_16=""
+    COLOR_82=""
+    COLOR_208=""
+    COLOR_75=""
+    COLOR_123=""
+    COLOR_226=""
+    COLOR_55=""
+    BOLD=""
+    UNDERLINE=""
+    REVERSE=""
+fi
+
+# Export color variables
+export BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE RESET ORANGE LIGHT_BLUE LIGHT_GREEN LIGHT_CYAN LIGHT_MAGENTA LIGHT_YELLOW COLOR_16 COLOR_82 COLOR_208 COLOR_75 COLOR_123 COLOR_226 COLOR_55 BOLD UNDERLINE REVERSE
+
+#####################
+### Color helpers ###
+#####################
+
+echo__light_green() {
+    # Print text in green with bold formatting
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s%s%s\n" "${BOLD}${LIGHT_GREEN}" "$1" "${RESET}"
+    else
+        echo "$1"
+    fi
+}
+
+echo_dark_purple() {
+    # Print text in white with bold formatting
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s%s%s\n" "${BOLD}${COLOR_55}" "$1" "${RESET}"
+    else
+        echo "$1"
+    fi
+}
+
+echo_gray() {
+    # Print text in white with bold formatting
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s%s%s\n" "${COLOR_16}" "$1" "${RESET}"
+    else
+        echo "$1"
+    fi
+}
+
+echo_rainbow_text() {
+    local text="$1"
+    local colors=("${RED}" "${ORANGE}" "${YELLOW}" "${GREEN}" "${CYAN}" "${BLUE}" "${MAGENTA}")
+    local num_colors=${#colors[@]}
+    local color_index=0
+
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        for (( i=0; i<${#text}; i++ )); do
+            local char="${text:$i:1}"
+            printf "%s%s" "${colors[$color_index]}" "$char"
+            color_index=$(( (color_index + 1) % num_colors ))
+        done
+        printf "%s\n" "$RESET"
+    else
+        echo "$text"
+    fi
+}
+
+echo_white() {
+    # Print text in white with bold formatting
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s%s%s\n" "${WHITE}" "$1" "${RESET}"
+    else
+        echo "$1"
+    fi
+}
+
+echo_white_bold() {
+    # Print text in white with bold formatting
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s%s%s\n" "${BOLD}${WHITE}" "$1" "${RESET}"
+    else
+        echo "$1"
+    fi
+}
+
+echo_set_variables() {
+    local variable_name=$1
+    local setting=$2
+
+    # Print variable_name in white and setting in bold blue within parentheses
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "%s (%s%s%s)\n" "${BOLD}${WHITE}${variable_name}${RESET}" "${ORANGE}${setting}${RESET}" "${RESET}"
+    else
+        echo "$variable_name ($setting)"
+    fi
+}
+
+echo_command_check() {
+    local V_ID=$1
+    local V_ID_NAME=$2
+
+    # Print variable_name in white and setting in bold blue within parentheses
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        printf "${BOLD}Running STIG check: %s (%s%s%s)\n" "${BOLD}${BLUE}${V_ID}${RESET}" "${WHITE}${V_ID_NAME}${RESET}" "${RESET}"
+    else
+        echo "Running STIG check: $V_ID ($V_ID_NAME)"
+    fi
+}
+
+echo_result() {
+    # Print the result in white and status in green/red if color is enabled
+    local status="$1"
+
+    if [ "$MAKE_TERMINAL_COLORFUL" = true ]; then
+        if [ "$status" = "Passed" ]; then
+            printf "%s${BOLD}Results: (%s%s%s)\n" "${WHITE}" "${RESET}" "${BOLD}${GREEN}Passed${RESET}" "${RESET}"
+        elif [ "$status" = "Failed" ]; then
+            printf "%s${BOLD}Results: (%s%s%s)\n" "${WHITE}" "${RESET}" "${BOLD}${RED}Failed${RESET}" "${RESET}"
+        else
+            printf "%s${BOLD}Results: (%s%s%s)\n" "${WHITE}" "${RESET}" "${BOLD}${YELLOW}Manual Verify${RESET}"
+        fi
+    else
+        echo "Check Results: $status"
+    fi
+}
+
 ####################################################################################################
 #
 # Echo Settings into Terminal Below
@@ -66,20 +250,24 @@ fi
 
 # Echo the values to the terminal
 if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-    echo "############################################"
-    echo "######### SCRIPT SET VARIABLES #############"
-    echo "STIG Version: $STIG_VERSION"
-    echo "Pass Log File: $PASS_LOG_FILE"
-    echo "Failure Log File: $FAILURE_LOG_FILE"
-    echo "Single Log File: $SINGLE_LOG_FILE"
-    echo "Command Log File: $COMMAND_LOG_FILE"
+    echo__light_green "==========================================================="
+    echo__light_green "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = ="
+    echo__light_green "(⌐■_■) SCRIPT SET VARIABLES"
+    echo__light_green "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = ="
+    echo__light_green "==========================================================="
+    echo_set_variables "STIG Version:" "$STIG_VERSION"
+    echo_set_variables "Passed log file:" "$PASS_LOG_FILE"
+    echo_set_variables "Failed log file:" "$FAILURE_LOG_FILE"
+    echo_set_variables "Single log file:" "$SINGLE_LOG_FILE"
+    echo_set_variables "Command log file:" "$COMMAND_LOG_FILE"
+    echo ""
+    echo_set_variables "Clear existing logs:" "$CLEAR_LOGS"
+    echo_set_variables "Log to single file:" "$LOG_TO_SINGLE_FILE"
+    echo_set_variables "Log commands:" "$LOG_COMMANDS"
+    echo_set_variables "Hide results in terminal:" "$HIDE_RESULTS_IN_TERMINAL"
+    echo_rainbow_text "Make terminal colorful: ($MAKE_TERMINAL_COLORFUL)"
+    echo__light_green "==========================================================="
 
-    echo "Clear Logs: $CLEAR_LOGS"
-    echo "Log to Single File: $LOG_TO_SINGLE_FILE"
-    echo "Log Commands: $LOG_COMMANDS"
-    echo "Hide Results in Terminal: $HIDE_RESULTS_IN_TERMINAL"
-    echo "############################################"
-    echo "############################################"
 fi
 
 ####################################################################################################
@@ -92,17 +280,21 @@ fi
 if [ "$CLEAR_LOGS" = true ]; then
     if [ "$LOG_TO_SINGLE_FILE" = true ]; then
         : > "$SINGLE_LOG_FILE"
-        echo "Cleared $SINGLE_LOG_FILE."
+        echo ""
+        echo_white_bold "Cleared existing log before starting:"
+        echo_gray "$SINGLE_LOG_FILE"
+        echo ""
+        echo_magenta "==========================================================="
     else
         : > "$PASS_LOG_FILE"
         : > "$FAILURE_LOG_FILE"
         : > "$COMMAND_LOG_FILE"
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
         echo ""
+        echo_white_bold "Cleared existing logs before starting:"
+        echo_gray "$PASS_LOG_FILE , $FAILURE_LOG_FILE , and $COMMAND_LOG_FILE"
         echo ""
-        echo "Cleared $PASS_LOG_FILE, $FAILURE_LOG_FILE, and $COMMAND_LOG_FILE."
-        echo ""
-        echo ""
+        echo__light_green "==========================================================="
         fi
     fi
 fi
@@ -143,43 +335,51 @@ update_plist() {
 add_date_header_combined() {
     local log_file=$1
 
-    echo "############################################" >> "$log_file"
-    echo "########## $STIG_VERSION ##########" >> "$log_file"
-    echo "########### COMPLETE STIG CHECKS ###########" >> "$log_file"
-    echo "##### Log Date: $(date +'%Y-%m-%d %I:%M:%S %p') #####" >> "$log_file"
-    echo "############################################" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "$STIG_VERSION" >> "$log_file"
+    echo "COMPLETE STIG CHECKS" >> "$log_file"
+    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
 }
 
 add_date_header_passed() {
     local log_file=$1
 
-    echo "############################################" >> "$log_file"
-    echo "########## $STIG_VERSION ##########" >> "$log_file"
-    echo "############ PASSED STIG CHECKS ############" >> "$log_file"
-    echo "##### Log Date: $(date +'%Y-%m-%d %I:%M:%S %p') #####" >> "$log_file"
-    echo "############################################" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "$STIG_VERSION" >> "$log_file"
+    echo "PASSED STIG CHECKS" >> "$log_file"
+    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
 }
 
 add_date_header_failed() {
     local log_file=$1
 
-    echo "############################################" >> "$log_file"
-    echo "########## $STIG_VERSION ##########" >> "$log_file"
-    echo "############ FAILED STIG CHECKS ############" >> "$log_file"
-    echo "##### Log Date: $(date +'%Y-%m-%d %I:%M:%S %p') #####" >> "$log_file"
-    echo "############################################" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "$STIG_VERSION" >> "$log_file"
+    echo "FAILED STIG CHECKS" >> "$log_file"
+    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
 }
 
 add_date_header_commands() {
     local log_file=$1
-    echo "############################################" >> "$log_file"
-    echo "########## $STIG_VERSION ##########" >> "$log_file"
-    echo "######### STIG COMMAND OUTPUT LOGS #########" >> "$log_file"
-    echo "##### Log Date: $(date +'%Y-%m-%d %I:%M:%S %p') #####" >> "$log_file"
-    echo "############################################" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "$STIG_VERSION" >> "$log_file"
+    echo "STIG COMMAND OUTPUT LOGS" >> "$log_file"
+    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
+    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
+    echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
 } 
 
@@ -217,8 +417,8 @@ log_result() {
 
 
     if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-    echo "Logged result output to $log_file"
-    echo "Results: $check_name: $result"
+    echo_gray "Logged result output to $log_file"
+    echo_result "$result"
     fi
 }
 
@@ -232,7 +432,7 @@ log_command_output() {
     local chip_specific=$6
 
     if [ "$LOG_COMMANDS" = true ]; then
-        echo "############################################" >> "$COMMAND_LOG_FILE"
+        echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$COMMAND_LOG_FILE"
         echo "Run Time: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$COMMAND_LOG_FILE"
         echo "Vul ID: $check_name ($simple_name)" >> "$COMMAND_LOG_FILE"
         echo "" >> "$COMMAND_LOG_FILE"
@@ -243,12 +443,12 @@ log_command_output() {
         if [ -n "$chip_specific" ]; then
         echo "Chip Specific: $chip_specific" >> "$COMMAND_LOG_FILE" 
         fi       
-        echo "############################################" >> "$COMMAND_LOG_FILE"
+        echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$COMMAND_LOG_FILE"
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-        echo "Logged command output to $COMMAND_LOG_FILE"
+        echo_gray "Logged command output to $COMMAND_LOG_FILE"
         fi
     fi
-}
+} 
 
 
 ####################################################################################################
@@ -265,11 +465,11 @@ execute_and_log() {
     local simple_name=$4
 
     if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-        echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
-        echo "Running check command for $check_name ($simple_name) "
+        echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+        echo_command_check "$check_name" "$simple_name"
     fi
     # Execute the command and capture the output
-    result_output=$(eval "$command")
+    result_output=$(eval "$command" 2>/dev/null)
 
     # Log the command output
     log_command_output "$check_name" "$command" "$result_output" "$expected_result" "$simple_name"
@@ -300,11 +500,11 @@ execute_and_log_chip_specific() {
 
     if [[ "$chip_specific" == *"$device_chip"* ]]; then
       if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-          echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
-          echo "Running check command for $check_name ($simple_name) "
+        echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+        echo_command_check "$check_name" "$simple_name"
       fi
       # Execute the command and capture the output
-      result_output=$(eval "$command")
+      result_output=$(eval "$command" 2>/dev/null)
 
       # Log the command output
       log_command_output "$check_name" "$command" "$result_output" "$expected_result" "$simple_name" "$chip_specific"
@@ -327,11 +527,11 @@ execute_and_log_chip_specific() {
     else
       if [ "$HIDE_NONCHIP_SUPPORTED_COMMANDS" = false ]; then
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-            echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
-            echo "Running check command for $check_name ($simple_name) "
+        echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+        echo_command_check "$check_name" "$simple_name"
         fi
         # Execute the command and capture the output
-        result_output=$(eval "$command")
+        result_output=$(eval "$command" 2>/dev/null)
 
         # Log the command output
         log_command_output "$check_name" "$command" "$result_output" "$expected_result" "$simple_name" "$chip_specific"
@@ -363,7 +563,7 @@ execute_anyresult_and_log() {
     local simple_name=$4
 
     # Execute the command and capture the output
-    result_output=$(eval "$command")
+    result_output=$(eval "$command" 2>/dev/null)
 
     # Log the command output
     log_command_output "$check_name" "$command" "$result_output" "$expected_result"
@@ -428,10 +628,11 @@ execute_anyresult_and_log() {
 # Starting List
 
 if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-    echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
-    echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
-    echo "# # # # # # # STARTING STIG CHECKS  # # # # # # # # #"
-    echo "# # # # # # # # # # # # # # # # # # # # # # # # # # #"
+    echo_dark_purple "==========================================================="
+    echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+    echo_dark_purple " STARTING STIG CHECKS"
+    echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+    echo_dark_purple "==========================================================="
 fi
 
 ##############################################
