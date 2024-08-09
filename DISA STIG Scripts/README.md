@@ -46,7 +46,7 @@ sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
 </p>
 
 ## <p align="center"> [Sonoma STIG Fixer](https://github.com/cocopuff2u/Mac-Scripts/blob/1c495c72ff1970292f19b3427a9d5323cfff658e/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20FIXER.sh) </p> 
-<p align="center"> Script checks the required DISA STIGS against the machines current settings and fixes based on the required STIG fix. Keep in mind not all STIGs can be fixed via command, some require MDM configuration profiles</p>
+<p align="center"> Script checks the required DISA STIGS against the machines current settings and fixes based on the required STIG fix. Will only run the fix if it finds a failure. Keep in mind not all STIGs can be fixed via command, some require MDM configuration profiles</p>
 <br />
 
 <p align="center"> Terminal Output </p>
