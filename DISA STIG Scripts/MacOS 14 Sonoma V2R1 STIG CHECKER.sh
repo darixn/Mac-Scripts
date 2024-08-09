@@ -284,7 +284,7 @@ if [ "$CLEAR_LOGS" = true ]; then
         echo_white_bold "Cleared existing log before starting:"
         echo_gray "$SINGLE_LOG_FILE"
         echo ""
-        echo_magenta "==========================================================="
+        echo__light_green "==========================================================="
     else
         : > "$PASS_LOG_FILE"
         : > "$FAILURE_LOG_FILE"
