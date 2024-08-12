@@ -20,6 +20,7 @@
 #  1.4 8/08/24 - Moved current user below adjustable variables and added 2>/dev/null to clean up
 #  noise in terminal *result_output=$(eval "$command" 2>/dev/null)*
 #  1.5 8/9/24 - Adjusted logging in terminal and file
+#  1.6 8/12/24 - fixed check for V-259530
 #
 ####################################################################################################
 # Script Supported STIG Version
@@ -1764,8 +1765,8 @@ execute_and_log "$check_name" "$command" "$expected_result" "$simple_name"
 check_name="V-259530"
 simple_name="Enforce_Device_Dictation_Apple_Chip"
 command="/usr/bin/osascript -l JavaScript << EOS
-$.NSUserDefaults.alloc.initWithSuiteName('com.apple.assistant.support')\
-.objectForKey('Siri Data Sharing Opt-In Status').js
+$.NSUserDefaults.alloc.initWithSuiteName('com.apple.applicationaccess')\
+.objectForKey('forceOnDeviceOnlyDictation').js
 EOS"
 expected_result="true"
 chip_specific="Apple Only"
