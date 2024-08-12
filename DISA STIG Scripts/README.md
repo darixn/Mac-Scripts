@@ -1,12 +1,12 @@
 # <p align="center"> DISA STIG Scripts </p>
 
-These scripts are to check and fix based on STIG requirements, now not all STIG requirements can be fixed via command line and some require configuration profiles pushed via a MDM. I did not include those configuration profiles as they posted on https://public.cyber.mil/stigs/. Please reach out for any recommendations or issues.
+  These scripts are designed to check and address STIG requirements. However, please note that not all STIG requirements can be resolved via command line; some require configuration profiles that need to be deployed through an MDM. These profiles are available at https://public.cyber.mil/stigs/, but I have not included them here. For any recommendations or issues, please feel free to reach out.
 <br />
 <br />
-Each Script will have variables that need to be adjusted to generate logs locally on the machine, please adjust accordingly to your needs.
+  Each script contains variables that need to be adjusted to generate logs locally on your machine, so please configure these settings as needed.
 <br />
 <br />
-I've included the import DoD Certifcates script in here too, this will help import the required DoD certifcates into the system keychain
+Additionally, I have included a script for importing DoD certificates, which will facilitate the process of adding the required certificates into the system keychain.
 <br />
 ### <p align="center"> <ins> Executing Scripts</ins> </p>
 
@@ -21,7 +21,7 @@ sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
 ``` 
 
 ## <p align="center"> [Sonoma STIG Checker](https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20CHECKER.sh) </p> 
-<p align="center"> Script checks the required DISA STIGS against the machines current settings and logs the information for the admin. The logs are located in the /var/log/* folder unless changed in the script.</p>
+<p align="center"> The script evaluates the machine's current settings against the required DISA STIGs and generates detailed logs for the administrator. By default, the logs are saved in the /var/log/ directory, though this location can be adjusted within the script</p>
 <br />
 
 <p align="center"> Terminal Log Output </p>
@@ -46,7 +46,7 @@ sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
 </p>
 
 ## <p align="center"> [Sonoma STIG Fixer](https://github.com/cocopuff2u/Mac-Scripts/blob/1c495c72ff1970292f19b3427a9d5323cfff658e/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20FIXER.sh) </p> 
-<p align="center"> Script checks the required DISA STIGS against the machines current settings and fixes based on the required STIG fix. Will only run the fix if it finds a failure. Keep in mind not all STIGs can be fixed via command, some require MDM configuration profiles</p>
+<p align="center">The script assesses the machine's current settings against the required DISA STIGs and applies fixes as needed. It will only execute a fix if a failure is detected. Please note that not all STIG requirements can be resolved through command line alone; some may necessitate MDM configuration profiles</p>
 <br />
 
 <p align="center"> Terminal Output </p>
