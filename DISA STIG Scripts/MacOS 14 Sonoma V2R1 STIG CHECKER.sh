@@ -20,7 +20,7 @@
 #  1.4 8/08/24 - Moved current user below adjustable variables and added 2>/dev/null to clean up
 #  noise in terminal *result_output=$(eval "$command" 2>/dev/null)*
 #  1.5 8/9/24 - Adjusted logging in terminal and file
-#  1.6 8/12/24 - fixed check for V-259530
+#  1.6 8/12/24 - fixed check for V-259530 & fixed execute_anyresult_and_log terminal logging
 #
 ####################################################################################################
 # Script Supported STIG Version
@@ -563,6 +563,11 @@ execute_anyresult_and_log() {
     local expected_result=$3
     local simple_name=$4
 
+    if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
+    echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
+    echo_command_check "$check_name" "$simple_name"
+    fi
+  
     # Execute the command and capture the output
     result_output=$(eval "$command" 2>/dev/null)
 
