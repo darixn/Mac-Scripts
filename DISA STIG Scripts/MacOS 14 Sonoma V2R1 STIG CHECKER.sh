@@ -22,26 +22,39 @@
 #  1.5 8/9/24 - Adjusted logging in terminal and file
 #  1.6 8/12/24 - fixed check for V-259530 & fixed execute_anyresult_and_log terminal logging
 #  1.7 8/13/24 - condensed add header functions
+#  2.0 8/13/24 - Added user path logging, added support for CSV, and added more hide
 #
 ####################################################################################################
 # Script Supported STIG Version
 STIG_VERSION="MACOS 14 (SONOMA) V2R1" # [ Do Not Adjust ]
 
-# Script Log Location [ /var/log/yourcompany_Passed_STIG_Scan.log ]
-PASS_LOG_FILE="/var/log/Passed_STIG_Scan.log"
-FAILURE_LOG_FILE="/var/log/Failed_STIG_Scan.log"
-SINGLE_LOG_FILE="/var/log/Complete_STIG_Scan.log"
-COMMAND_LOG_FILE="/var/log/Command_STIG.log"
-PLIST_FILE="/Library/Preferences/STIG_Checks.plist"
+# Script Log Names [ /var/log/Passed_STIG_Scan.log ]
+PASS_LOG_FILE_NAME="Passed_STIG_Scan.log"
+FAILURE_LOG_FILE_NAME="Failed_STIG_Scan.log"
+SINGLE_LOG_FILE_NAME="Complete_STIG_Scan.log"
+COMMAND_LOG_FILE_NAME="Command_STIG.log"
 
-# Default values for logs
+# Logging Options
 CLEAR_LOGS=true # Clears existing local logs before running [ true (default) | false ] )
+LOG_PATH="" # Change default path [ if left blank the default path is /var/log/ ]
 LOG_TO_SINGLE_FILE=false # Logs failures & passes in one log file [ true | false (default) ]
 LOG_COMMANDS=true # Shows the commands input and output in a log file, *PERFECT FOR FILLING OUT STIG CHECKS* [ true (default) | false ]
+LOG_RESULTS_TO_USER_LOG_FOLDER=true # Logs results to the users log folder [ true (default) | false ]
+
+# Plist Options
 LOG_TO_PLIST=false # logs failures & passes to a plist file [ true  | false (default) ]
+PLIST_LOG_FILE="/Library/Preferences/STIG_Checks.plist" # Default [ /Library/Preferences/STIG_Checks.plist ]
+
+# CSV Options
+LOG_TO_CSV=false # logs failures & passes to a csv file [ true  | false (default) ]
+CSV_LOG_FILE="/var/log/STIG_csv_logs.csv" # Default [ /var/log/STIG_csv_logs.csv ]
+
+# Other Options
 HIDE_RESULTS_IN_TERMINAL=false # Show output in terminal when running script local [ true | false (default) ]
-HIDE_NONCHIP_SUPPORTED_COMMANDS=true # Only runs commands supported on this hardware [ true (default) | false ]
 MAKE_TERMINAL_COLORFUL=true # Gives terminal color for the outputs * Requires HIDE_RESULTS_IN_TERMINAL=false * [ true (default) | false ]
+HIDE_LOGGING_LOCATION_IN_TERMINAL=true # Hides logging location in terminal when running script local [ true (default) | false ]
+HIDE_NONCHIP_SUPPORTED_COMMANDS=true # Only runs commands supported on this hardware [ true (default) | false ]
+
 
 ####################################################################################################
 #
@@ -64,6 +77,26 @@ fi
 
 # Pulls Current User
 CURRENT_USER=$( /usr/sbin/scutil <<< "show State:/Users/ConsoleUser" | /usr/bin/awk '/Name :/ && ! /loginwindow/ { print $3 }' )
+
+# Construct the path to the current user's Logs folder
+USER_LOG_FILE="/Users/$CURRENT_USER/Library/Logs/"
+
+if [ -z "$LOG_PATH" ]; then
+    LOG_PATH="/var/log/"
+fi
+
+# Admin Log Locations
+PASS_LOG_FILE="$LOG_PATH$PASS_LOG_FILE_NAME"
+FAILURE_LOG_FILE="$LOG_PATH$FAILURE_LOG_FILE_NAME"
+SINGLE_LOG_FILE="$LOG_PATH$SINGLE_LOG_FILE_NAME"
+COMMAND_LOG_FILE="$LOG_PATH$COMMAND_LOG_FILE_NAME"
+
+# User Log Locations
+# Construct the path to the current user's Logs folder
+USER_PASS_LOG_FILE="$USER_LOG_FILE$PASS_LOG_FILE_NAME"
+USER_FAILURE_LOG_FILE="$USER_LOG_FILE$FAILURE_LOG_FILE_NAME"
+USER_SINGLE_LOG_FILE="$USER_LOG_FILE$SINGLE_LOG_FILE_NAME"
+USER_COMMAND_LOG_FILE="$USER_LOG_FILE$COMMAND_LOG_FILE_NAME"
 
 ####################################################################################################
 #
@@ -258,18 +291,30 @@ if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
     echo__light_green "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = ="
     echo__light_green "==========================================================="
     echo_set_variables "STIG Version:" "$STIG_VERSION"
-    echo_set_variables "Passed log file:" "$PASS_LOG_FILE"
-    echo_set_variables "Failed log file:" "$FAILURE_LOG_FILE"
-    echo_set_variables "Single log file:" "$SINGLE_LOG_FILE"
-    echo_set_variables "Command log file:" "$COMMAND_LOG_FILE"
+    echo_white "Script written by https://github.com/cocopuff2u"
     echo ""
-    echo_set_variables "Clear existing logs:" "$CLEAR_LOGS"
-    echo_set_variables "Log to single file:" "$LOG_TO_SINGLE_FILE"
-    echo_set_variables "Log commands:" "$LOG_COMMANDS"
-    echo_set_variables "Hide results in terminal:" "$HIDE_RESULTS_IN_TERMINAL"
-    echo_rainbow_text "Make terminal colorful: ($MAKE_TERMINAL_COLORFUL)"
+    echo_set_variables "Passed Log File Path" "$PASS_LOG_FILE"
+    echo_set_variables "Failed Log File Path" "$FAILURE_LOG_FILE"
+    echo_set_variables "Consolidate Log File Path" "$SINGLE_LOG_FILE"
+    echo_set_variables "Command Log File Path" "$COMMAND_LOG_FILE"
+    echo ""
+    echo_set_variables "Clear Existing Logs" "$CLEAR_LOGS"
+    echo_set_variables "Consolidate Logs" "$LOG_TO_SINGLE_FILE"
+    echo_set_variables "Log Command Output/Input" "$LOG_COMMANDS"
+    echo ""
+    echo_set_variables "Log Results to Users Log Folder" "$LOG_RESULTS_TO_USER_LOG_FOLDER"
+    echo_set_variables "Users Log Folder" "$USER_LOG_FILE"
+    echo ""
+    echo_set_variables "Log Results to Plist" "$LOG_TO_PLIST"
+    echo_set_variables "Plist Log File Path" "$PLIST_LOG_FILE"
+    echo_set_variables "Log Results to CSV" "$LOG_TO_CSV"
+    echo_set_variables "CSV Log File Path" "$CSV_LOG_FILE"
+    echo ""
+    echo_set_variables "Hide Results in Ierminal" "$HIDE_RESULTS_IN_TERMINAL"
+    echo_rainbow_text "Enable Terminal Colorization ($MAKE_TERMINAL_COLORFUL)"
+    echo_set_variables "Hide Logging Location in Ierminal" "$HIDE_LOGGING_LOCATION_IN_TERMINAL"
+    echo_set_variables "Hide Nonchip Supported Commands" "$HIDE_NONCHIP_SUPPORTED_COMMANDS"
     echo__light_green "==========================================================="
-
 fi
 
 ####################################################################################################
@@ -282,19 +327,27 @@ fi
 if [ "$CLEAR_LOGS" = true ]; then
     if [ "$LOG_TO_SINGLE_FILE" = true ]; then
         : > "$SINGLE_LOG_FILE"
+        : > "$USER_SINGLE_LOG_FILE"
+        : > "$CSV_LOG_FILE"
         echo ""
         echo_white_bold "Cleared existing log before starting:"
-        echo_gray "$SINGLE_LOG_FILE"
+        echo_gray "$SINGLE_LOG_FILE and $USER_SINGLE_LOG_FILE"
         echo ""
         echo__light_green "==========================================================="
     else
         : > "$PASS_LOG_FILE"
         : > "$FAILURE_LOG_FILE"
         : > "$COMMAND_LOG_FILE"
+        : > "$CSV_LOG_FILE"
+        : > "$USER_PASS_LOG_FILE"
+        : > "$USER_FAILURE_LOG_FILE"
+        : > "$USER_COMMAND_LOG_FILE"
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
         echo ""
         echo_white_bold "Cleared existing logs before starting:"
+        echo_gray "$CSV_LOG_FILE"
         echo_gray "$PASS_LOG_FILE , $FAILURE_LOG_FILE , and $COMMAND_LOG_FILE"
+        echo_gray "$USER_PASS_LOG_FILE , $USER_FAILURE_LOG_FILE , and $USER_COMMAND_LOG_FILE"
         echo ""
         echo__light_green "==========================================================="
         fi
@@ -303,12 +356,12 @@ fi
 
 # Function to initialize the plist file
 initialize_plist() {
-    echo '<?xml version="1.0" encoding="UTF-8"?>' > "$PLIST_FILE"
-    echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> "$PLIST_FILE"
-    echo '<plist version="1.0">' >> "$PLIST_FILE"
-    echo '<dict>' >> "$PLIST_FILE"
-    echo '</dict>' >> "$PLIST_FILE"
-    echo '</plist>' >> "$PLIST_FILE"
+    echo '<?xml version="1.0" encoding="UTF-8"?>' > "$PLIST_LOG_FILE"
+    echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> "$PLIST_LOG_FILE"
+    echo '<plist version="1.0">' >> "$PLIST_LOG_FILE"
+    echo '<dict>' >> "$PLIST_LOG_FILE"
+    echo '</dict>' >> "$PLIST_LOG_FILE"
+    echo '</plist>' >> "$PLIST_LOG_FILE"
 }
 
 initialize_plist
@@ -323,14 +376,14 @@ update_plist() {
     local temp_plist="/var/log/STIG_Checks_temp.plist"
 
     # Extract the existing plist content
-    /usr/libexec/PlistBuddy -x -c "Print" "$PLIST_FILE" > "$temp_plist"
+    /usr/libexec/PlistBuddy -x -c "Print" "$PLIST_LOG_FILE" > "$temp_plist"
 
     # Update the plist with the new check result
     /usr/libexec/PlistBuddy -c "Add :$check_name\_$simple_name dict" "$temp_plist"
     /usr/libexec/PlistBuddy -c "Add :$check_name\_$simple_name:finding bool $boolean_result" "$temp_plist"
 
     # Replace the original plist file with the updated one
-    mv "$temp_plist" "$PLIST_FILE"
+    mv "$temp_plist" "$PLIST_LOG_FILE"
 }
 
 # Function to add date header to log files
@@ -352,15 +405,20 @@ add_date_header() {
 if [ "$LOG_TO_SINGLE_FILE" = false ]; then
     add_date_header "$PASS_LOG_FILE" "PASSED STIG CHECKS"
     add_date_header "$FAILURE_LOG_FILE" "FAILED STIG CHECKS"
+    add_date_header "$USER_PASS_LOG_FILE" "PASSED STIG CHECKS"
+    add_date_header "$USER_FAILURE_LOG_FILE" "FAILED STIG CHECKS"
     # Add date header to command logs
     if [ "$LOG_COMMANDS" = true ]; then
         add_date_header "$COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
+        add_date_header "$USER_COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
     fi
 else
     add_date_header "$SINGLE_LOG_FILE" "COMPLETE STIG CHECKS"
+    add_date_header "$USER_SINGLE_LOG_FILE" "COMPLETE STIG CHECKS"
     # Add date header to command logs
     if [ "$LOG_COMMANDS" = true ]; then
-        add_data_header "$COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
+        add_date_header "$COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
+        add_date_header "$USER_COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
     fi
 fi
 
@@ -372,20 +430,31 @@ log_result() {
 
     if [ "$LOG_TO_SINGLE_FILE" = true ]; then
         log_file="$SINGLE_LOG_FILE"
+        User_log_file="$USER_SINGLE_LOG_FILE"
     else
         if [ "$result" = "Passed" ]; then
             log_file="$PASS_LOG_FILE"
+            User_log_file="$USER_PASS_LOG_FILE"
         else
             log_file="$FAILURE_LOG_FILE"
+            User_log_file="$USER_FAILURE_LOG_FILE"
         fi
     fi
 
     # Append the log message to the appropriate file with a timestamp
     echo "$check_name: $result$( [ "$HIDE_NONCHIP_SUPPORTED_COMMANDS" = false ] && [ -n "$chip_specific" ] && echo " (Chip Specific: $chip_specific)" )" >> "$log_file"
 
+    if [ "$LOG_RESULTS_TO_USER_LOG_FOLDER" = true ]; then
+    echo "$check_name: $result$( [ "$HIDE_NONCHIP_SUPPORTED_COMMANDS" = false ] && [ -n "$chip_specific" ] && echo " (Chip Specific: $chip_specific)" )" >> "$User_log_file"
+    fi
 
     if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
+    if [ "$HIDE_LOGGING_LOCATION_IN_TERMINAL" = false ]; then
     echo_gray "Logged result output to $log_file"
+    if [ "$LOG_RESULTS_TO_USER_LOG_FOLDER" = true ]; then
+    echo_gray "Logged result output to $User_log_file"
+    fi
+    fi
     echo_result "$result"
     fi
 }
@@ -398,6 +467,11 @@ log_command_output() {
     local expected_result=$4
     local simple_name=$5
     local chip_specific=$6
+
+
+    if [ "$LOG_TO_CSV" = true ]; then
+    write_to_csv "$check_name" "$command_output" "$expected_result" "$simple_name" "$chip_specific"
+    fi
 
     if [ "$LOG_COMMANDS" = true ]; then
         echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$COMMAND_LOG_FILE"
@@ -412,12 +486,62 @@ log_command_output() {
         echo "Chip Specific: $chip_specific" >> "$COMMAND_LOG_FILE"
         fi
         echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$COMMAND_LOG_FILE"
+            if [ "$LOG_RESULTS_TO_USER_LOG_FOLDER" = true ]; then
+        echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$USER_COMMAND_LOG_FILE"
+        echo "Run Time: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$USER_COMMAND_LOG_FILE"
+        echo "Vul ID: $check_name ($simple_name)" >> "$USER_COMMAND_LOG_FILE"
+        echo "" >> "$USER_COMMAND_LOG_FILE"
+        echo "Command Inputted: $command" >> "$USER_COMMAND_LOG_FILE"
+        echo "" >> "$USER_COMMAND_LOG_FILE"
+        echo "Command Outputted: $command_output" >> "$USER_COMMAND_LOG_FILE"
+        echo "Expected STIG Result: $expected_result" >> "$USER_COMMAND_LOG_FILE"
+        if [ -n "$chip_specific" ]; then
+        echo "Chip Specific: $chip_specific" >> "$USER_COMMAND_LOG_FILE"
+        fi
+        echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$USER_COMMAND_LOG_FILE"
+    fi
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
-        echo_gray "Logged command output to $COMMAND_LOG_FILE"
+        if [ "$HIDE_LOGGING_LOCATION_IN_TERMINAL" = false ]; then
+            echo_gray "Logged command output to $COMMAND_LOG_FILE"
+            if [ "$LOG_RESULTS_TO_USER_LOG_FOLDER" = true ]; then
+            echo_gray "Logged command output to $USER_COMMAND_LOG_FILE"
+            fi
+        fi
         fi
     fi
 }
 
+# Function to log results to CSV
+write_to_csv() {
+    local check_name="$1"
+    local command_output="$2"
+    local expected_result="$3"
+    local simple_name="$4"
+    local chip_specific="$5"
+
+    # Define the header
+    HEADER="Check Name,Simple Name,Pass/Fail,Result,Expected"
+
+    # Check if the file exists and if it contains the header
+    if [ ! -f "$CSV_LOG_FILE" ]; then
+        # File does not exist; write the header
+        echo "$HEADER" > "$CSV_LOG_FILE"
+    elif ! grep -q "^$HEADER$" "$CSV_LOG_FILE"; then
+        # File exists but does not contain the header; add the header
+        echo "$HEADER" >> "$CSV_LOG_FILE"
+    fi
+
+    # Preserve newlines and special characters by quoting the fields
+    local pass_fail
+    if [ "$command_output" = "$expected_result" ]; then
+        pass_fail="Passed"
+    else
+        pass_fail="Failed"
+    fi
+
+    # Append the data row to the CSV file
+    echo "$check_name,$simple_name,$pass_fail,\"$command_output\",\"$expected_result\"" >> "$CSV_LOG_FILE"
+}
 
 ####################################################################################################
 #
@@ -539,7 +663,7 @@ execute_anyresult_and_log() {
     result_output=$(eval "$command" 2>/dev/null)
 
     # Log the command output
-    log_command_output "$check_name" "$command" "$result_output" "$expected_result"
+    log_command_output "$check_name" "$command" "$result_output" "$expected_result" "$simple_name"
 
     # Determine the result and log it
     if [ -n "$result_output" ]; then
