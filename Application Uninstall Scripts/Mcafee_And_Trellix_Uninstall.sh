@@ -4,12 +4,12 @@
 #
 # Uninstalls Mcafee and Trelllix
 #
-# Purpose: Uninstall Mcafee and Trellix 
+# Purpose: Uninstall Mcafee and Trellix
 #
 # https://github.com/cocopuff2u
 #
 ####################################################################################################
-# 
+#
 # HISTORY
 #
 # 1.0 8/29/23 - I took the two following scripts below and combined them to clean both Mcafee & Trellix - @cocopuff2u
@@ -101,7 +101,7 @@ fi
 
 # Unload the McAfee and Trellix LaunchDaemons
 echo "unloading launch items"
-/bin/launchctl bootout system /Library/LaunchDaemons/com.mcafee.* 
+/bin/launchctl bootout system /Library/LaunchDaemons/com.mcafee.*
 /bin/launchctl bootout system /Library/LaunchAgents/com.mcafee.*
 /bin/launchctl bootout system /Library/LaunchAgents/com.mcafee.McAfeeSafariHost.plist
 /bin/launchctl bootout system /Library/LaunchAgents/com.mcafee.menulet.plist
@@ -130,7 +130,7 @@ echo "stopping running processes"
 /usr/local/McAfee/AntiMalware/VSControl mastop
 /usr/local/McAfee/StatefulFirewall/bin/StatefullFirewallControl mastop
 /usr/local/McAfee/WebProtection/bin/WPControl mastop
-/usr/local/McAfee/atp/bin/ATPControl mastop 
+/usr/local/McAfee/atp/bin/ATPControl mastop
 /usr/local/McAfee/FRP/bin/FRPControl mastop
 /usr/local/McAfee/Mar/MarControl stop
 /usr/local/McAfee/mvedr/MVEDRControl stop
@@ -166,29 +166,29 @@ echo ""
 echo "uninstalling system extensions"
 if [ -e /Applications/McAfeeSystemExtensions.app ] ; then
 	McAfeeNetworkExtensionLoaded=$(/usr/bin/systemextensionsctl list | /usr/bin/grep "McAfee Network Extension")
-	
+
 	if [[ -n "$McAfeeNetworkExtensionLoaded" ]]; then
 
 		# Prepare to update authorization database to allow system extensions to be uninstalled without password prompt.
 		ManagementDatabaseUpdatePreparation
-	
+
 		# Update authorization database with new settings.
 		UpdateManagementDatabase
-		
+
 		# Uninstall the System Extension
 		/usr/bin/sudo -u $userName /usr/local/McAfee/fmp/AAC/bin/deactivatesystemextension com.mcafee.CMF.networkextension
-		
+
 		# Once the system extensions are uninstalled, the relevant settings for the authorization database will be restored from backup to their prior state.
-		if [[ -n "$UpdatedAuthorizationSettingInstalled" ]]; then 
+		if [[ -n "$UpdatedAuthorizationSettingInstalled" ]]; then
 			RestoreManagementDatabase
-	
+
 			if [[ -n "$OriginalAuthorizationSettingInstalled" ]]; then
 				echo "com.apple.system-extensions.admin settings in the authorization database successfully restored to $original_setting."
 				rm -rf "$management_db_original_setting"
 				rm -rf "$management_db_edited_setting"
 				rm -rf "$management_db_check_setting"
 			fi
-	
+
 		fi
 	fi
 fi
@@ -263,22 +263,22 @@ echo "removing user and groups"
 /usr/bin/dscl . delete /Groups/mfe
 /usr/bin/dscl . delete /Groups/Virex
 echo ""
-			
+
 # Remove the Quarantine folder if present and empty.
 
 if [[ -z "$(/bin/ls -A /Quarantine 2>/dev/null | /usr/bin/grep -vE '(.DS_Store|.Quarantine.lck)')" ]]; then
 	/bin/rm -rf /Quarantine
 fi
-			
+
 localUsers=$(/usr/bin/dscl . -list /Users | /usr/bin/grep -v "^_")
 
 for userName in ${localUsers}; do
 
 	# Get path to user's home directory
 	userHome=$(/usr/bin/dscl . -read /Users/$userName NFSHomeDirectory 2>/dev/null | /usr/bin/sed 's/^[^\/]*//g')
-    
+
     # Remove user-level files from the user home directories.
-    
+
 	if [[ -d "$userHome" && "$userHome" != "/var/empty" ]]; then
 		/bin/rm -f "$userHome/Library/Preferences/com.mcafee."* \
 		           "$userHome/Library/Logs/DiagnosticReports/Menulet"*
