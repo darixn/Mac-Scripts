@@ -21,6 +21,7 @@
 #  noise in terminal *result_output=$(eval "$command" 2>/dev/null)*
 #  1.5 8/9/24 - Adjusted logging in terminal and file
 #  1.6 8/12/24 - fixed check for V-259530 & fixed execute_anyresult_and_log terminal logging
+#  1.7 8/13/24 - condensed add header functions
 #
 ####################################################################################################
 # Script Supported STIG Version
@@ -333,51 +334,14 @@ update_plist() {
 }
 
 # Function to add date header to log files
-add_date_header_combined() {
-    local log_file=$1
+add_date_header() {
+  local log_file=$1
+  local checks=$2
 
     echo "===========================================================" >> "$log_file"
     echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
     echo "$STIG_VERSION" >> "$log_file"
-    echo "COMPLETE STIG CHECKS" >> "$log_file"
-    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "===========================================================" >> "$log_file"
-    echo "" >> "$log_file"
-}
-
-add_date_header_passed() {
-    local log_file=$1
-
-    echo "===========================================================" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "$STIG_VERSION" >> "$log_file"
-    echo "PASSED STIG CHECKS" >> "$log_file"
-    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "===========================================================" >> "$log_file"
-    echo "" >> "$log_file"
-}
-
-add_date_header_failed() {
-    local log_file=$1
-
-    echo "===========================================================" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "$STIG_VERSION" >> "$log_file"
-    echo "FAILED STIG CHECKS" >> "$log_file"
-    echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "===========================================================" >> "$log_file"
-    echo "" >> "$log_file"
-}
-
-add_date_header_commands() {
-    local log_file=$1
-    echo "===========================================================" >> "$log_file"
-    echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
-    echo "$STIG_VERSION" >> "$log_file"
-    echo "STIG COMMAND OUTPUT LOGS" >> "$log_file"
+    echo "$checks" >> "$log_file"
     echo "Log Date: $(date +'%Y-%m-%d %I:%M:%S %p')" >> "$log_file"
     echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
     echo "===========================================================" >> "$log_file"
@@ -386,15 +350,18 @@ add_date_header_commands() {
 
 # Add date header to logs single or combined
 if [ "$LOG_TO_SINGLE_FILE" = false ]; then
-    add_date_header_passed "$PASS_LOG_FILE"
-    add_date_header_failed "$FAILURE_LOG_FILE"
+    add_date_header "$PASS_LOG_FILE" "PASSED STIG CHECKS"
+    add_date_header "$FAILURE_LOG_FILE" "FAILED STIG CHECKS"
+    # Add date header to command logs
+    if [ "$LOG_COMMANDS" = true ]; then
+        add_date_header "$COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
+    fi
 else
-    add_date_header_combined "$SINGLE_LOG_FILE"
-fi
-
-# Add date header to command logs
-if [ "$LOG_COMMANDS" = true ]; then
-    add_date_header_commands "$COMMAND_LOG_FILE"
+    add_date_header "$SINGLE_LOG_FILE" "COMPLETE STIG CHECKS"
+    # Add date header to command logs
+    if [ "$LOG_COMMANDS" = true ]; then
+        add_data_header "$COMMAND_LOG_FILE" "STIG COMMAND OUTPUT LOGS"
+    fi
 fi
 
 # Function to log results to the appropriate file
