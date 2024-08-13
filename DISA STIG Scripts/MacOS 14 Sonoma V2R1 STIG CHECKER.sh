@@ -382,7 +382,7 @@ add_date_header_commands() {
     echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
     echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
-} 
+}
 
 # Add date header to logs single or combined
 if [ "$LOG_TO_SINGLE_FILE" = false ]; then
@@ -397,7 +397,7 @@ if [ "$LOG_COMMANDS" = true ]; then
     add_date_header_commands "$COMMAND_LOG_FILE"
 fi
 
-# Function to log results to the appropriate file 
+# Function to log results to the appropriate file
 log_result() {
     local check_name=$1
     local result=$2
@@ -442,14 +442,14 @@ log_command_output() {
         echo "Command Outputted: $command_output" >> "$COMMAND_LOG_FILE"
         echo "Expected STIG Result: $expected_result" >> "$COMMAND_LOG_FILE"
         if [ -n "$chip_specific" ]; then
-        echo "Chip Specific: $chip_specific" >> "$COMMAND_LOG_FILE" 
-        fi       
+        echo "Chip Specific: $chip_specific" >> "$COMMAND_LOG_FILE"
+        fi
         echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$COMMAND_LOG_FILE"
         if [ "$HIDE_RESULTS_IN_TERMINAL" = false ]; then
         echo_gray "Logged command output to $COMMAND_LOG_FILE"
         fi
     fi
-} 
+}
 
 
 ####################################################################################################
@@ -523,7 +523,7 @@ execute_and_log_chip_specific() {
         if [ "$LOG_TO_PLIST" = true ]; then
         update_plist "$check_name" "$simple_name" "$boolean_result"
         fi
-      
+
       log_result "$check_name ($simple_name)" "$result" "$chip_specific"
     else
       if [ "$HIDE_NONCHIP_SUPPORTED_COMMANDS" = false ]; then
@@ -550,7 +550,7 @@ execute_and_log_chip_specific() {
         if [ "$LOG_TO_PLIST" = true ]; then
         update_plist "$check_name" "$simple_name" "$boolean_result"
         fi
-        
+
         log_result "$check_name ($simple_name)" "$result" "$chip_specific"
       fi
     fi
@@ -567,7 +567,7 @@ execute_anyresult_and_log() {
     echo_dark_purple "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = "
     echo_command_check "$check_name" "$simple_name"
     fi
-  
+
     # Execute the command and capture the output
     result_output=$(eval "$command" 2>/dev/null)
 
@@ -621,7 +621,7 @@ execute_anyresult_and_log() {
 #
 # #### NOTES ####
 # Some commands that contain $1 or $2 you you need to put \$2
-# Some commands that need single quotes "" changed to '' and visa versa 
+# Some commands that need single quotes "" changed to '' and visa versa
 # Some commands need to be ran without "" and use ''
 # Expected_value is case sensitive
 # Use another execute_anyresult_and_log function for results that need any output as not a finding
