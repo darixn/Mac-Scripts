@@ -21,7 +21,7 @@ sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
 ``` 
 
 ## <p align="center"> [Sonoma STIG Checker](https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20CHECKER.sh) </p> 
-<p align="center"> The script evaluates the machine's current settings against the required DISA STIGs and generates detailed logs for the administrator. By default, the logs are saved in the /var/log/ directory, though this location can be adjusted within the script</p>
+<p align="center"> This script assesses the machine's current configuration against the specified DISA STIGs and produces comprehensive logs for the administrator. By default, logs are saved in the /var/log/ or ~/log directory, but you can customize the location within the script. The script now supports output in plist, CSV, and log formats.</p>
 <br />
 
 <p align="center"> Terminal Log Output </p>
@@ -29,20 +29,24 @@ sudo bash "~/downloads/MacOS 14 Sonoma V2R1 STIG CHECKER.sh"
 <img src="https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/images/check_terminal_log.png">
 </p>
 
+<p align="center"> Plist Log Output </p>
+<p align="center">
+<img src="https://github.com/cocopuff2u/Mac-Scripts/blob/9751e2cbc619b14727ffd0c5537efdd87d01bbb8/DISA%20STIG%20Scripts/images/Example_plist_output.png">
+</p>
+
+<p align="center"> CSV Log Output </p>
+<p align="center">
+<img src="https://github.com/cocopuff2u/Mac-Scripts/blob/9751e2cbc619b14727ffd0c5537efdd87d01bbb8/DISA%20STIG%20Scripts/images/Example_csv_output.png">
+</p>
+
 <p align="center"> Command Log Output</p>
-<p align="center">*Great for checklists* </p>
 <p align="center">
 <img src="https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/images/Example_Command_output_log.png">
 </p>
 
-<p align="center"> Passed Log Output </p>
+<p align="center"> Failed/Passed Log Output </p>
 <p align="center">
 <img src="https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/images/Example_Passed_STIG_log.png">
-</p>
-
-<p align="center"> Failed Log Output </p>
-<p align="center">
-<img src="https://github.com/cocopuff2u/Mac-Scripts/blob/130024b9664872bddc16938225adc5fd6af0d194/DISA%20STIG%20Scripts/images/Example_Failed_STIG_Log.png">
 </p>
 
 ## <p align="center"> [Sonoma STIG Fixer](https://github.com/cocopuff2u/Mac-Scripts/blob/1c495c72ff1970292f19b3427a9d5323cfff658e/DISA%20STIG%20Scripts/MacOS%2014%20Sonoma%20V2R1%20STIG%20FIXER.sh) </p> 
