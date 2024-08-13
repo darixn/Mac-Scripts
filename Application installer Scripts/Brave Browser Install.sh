@@ -9,7 +9,7 @@
 # https://github.com/cocopuff2u
 #
 ####################################################################################################
-# 
+#
 # HISTORY
 #
 # 1.0 3/21/23 - Original Release - @cocopuff2u
@@ -34,7 +34,7 @@ hdiutil attach /tmp/$VendorDMG -nobrowse
 # Preserve all file attributes and ACLs
 cp -pPR /Volumes/Brave\ Browser/Brave\ Browser.app /Applications/
 
-# Identify the correct mount point for the vendor supplied DMG file 
+# Identify the correct mount point for the vendor supplied DMG file
 BraveBrowserDMG="$(hdiutil info | grep "/Volumes/Brave Browser" | awk '{ print $1 }')"
 
 # Unmount the vendor supplied DMG file
