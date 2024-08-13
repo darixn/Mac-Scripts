@@ -5,7 +5,7 @@
 # build 1.2 11/4/22 - added a nested if than statement to catch if the applications was already there, added curl to download direct from Apple
 # Build 1.3 4/11/23 - Upgraded Script to run for Ventura Deployment now
 
-#Built by Cody Keats 
+#Built by Cody Keats
 
 #This pulls current user to scope the path of the brandingimage
 currentUser=$(/bin/echo 'show State:/Users/ConsoleUser' | /usr/sbin/scutil | /usr/bin/awk '/Name / { print $3 }')
@@ -22,7 +22,7 @@ heading="MacOS Ventura Upgrade"
 #"Window Message"
 description="Currently we are in the process of upgrading those that can support MacOS Ventura. Your machine has been flagged for the upgrade.
 
-This upgrade will download in the background with no user input needed. Once downloaded you can do the upgrade at your leisure. 
+This upgrade will download in the background with no user input needed. Once downloaded you can do the upgrade at your leisure.
 
 If the upgrade fails to download or install this prompt will rerun on next weekly check-in.
 
@@ -47,7 +47,7 @@ userChoice=$("$jamfHelper" -windowType "$windowType" -icon "$icon" -title "$titl
 if [[ "$userChoice" == "0" ]]; then
 #Actions for Button 1 Go Here
 echo "proceed"
-        if [ -d "/Applications/Install MacOS Ventura.app" ] ; 
+        if [ -d "/Applications/Install MacOS Ventura.app" ] ;
         then
                 open "/Applications/Install MacOS Ventura.app"
                 else

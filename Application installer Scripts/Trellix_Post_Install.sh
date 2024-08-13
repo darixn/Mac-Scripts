@@ -11,7 +11,7 @@
 # Extra: Use with Jamf Composer to install the install.sh into /private/tmp/
 #
 ####################################################################################################
-# 
+#
 # HISTORY
 #
 # 1.0 - Original (https://github.com/franton/McAfee-Agent/blob/master/postinstall.sh)
