@@ -5,7 +5,7 @@
 #
 # Purpose: Checks then fixes the required DISA STIGS against the machines current settings
 # (KEEP IN MIND NOT ALL STIGS CAN BE FIXED WITH COMMAND LINE AND REQUIRE CONFIGURATION PROFILES)
-# 
+#
 # To run script open terminal and type 'sudo bash /path/to/script.sh'
 #
 # https://github.com/cocopuff2u
@@ -335,7 +335,7 @@ add_date_header_commands() {
     echo "= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =" >> "$log_file"
     echo "===========================================================" >> "$log_file"
     echo "" >> "$log_file"
-} 
+}
 
 # Add date header to command logs
 if [ "$LOG_COMMANDS" = true ]; then
@@ -382,7 +382,7 @@ log_command_output_failed() {
         echo "Configuration profiles can only be deployed via MDM" >> "$COMMAND_LOG_FILE"
         echo "(More Information: https://support.apple.com/guide/deployment/intro-to-mdm-profiles-depc0aadd3fe/web)" >> "$COMMAND_LOG_FILE"
     fi
-} 
+}
 
 log_command_output_passed() {
     local check_name="$1"
@@ -394,7 +394,7 @@ log_command_output_passed() {
           echo "" >> "$COMMAND_LOG_FILE"
           echo "STIG Check: Passed (No fix required)" >> "$COMMAND_LOG_FILE"
 
-} 
+}
 
 log_command_output_manual() {
     local check_name=$1
@@ -413,7 +413,7 @@ log_command_output_manual() {
         echo "STIG Check: Failed" >> "$COMMAND_LOG_FILE"
         echo "" >> "$COMMAND_LOG_FILE"
         echo "Fix requires manual review or correction based on setup" >> "$COMMAND_LOG_FILE"
-} 
+}
 
 ####################################################################################################
 #
@@ -803,7 +803,7 @@ complete_ssh_sshd_fix() {
 #
 # #### NOTES ####
 # Some commands that contain $1 or $2 you you need to put \$2
-# Some commands that need single quotes "" changed to '' and visa versa 
+# Some commands that need single quotes "" changed to '' and visa versa
 # Some commands need to be ran without "" and use ''
 # Expected_value is case sensitive
 # Use another execute_anyresult_and_log function for results that need any output as not a finding
@@ -1072,7 +1072,7 @@ execute_and_log "$check_name" "$command" "$expected_result" "$simple_name" "$fix
 ##############################################
 check_name="V-259439"
 simple_name="Limit_SSH_to_FIPS_Compliant"
-command="fips_ssh_config='Host * 
+command="fips_ssh_config='Host *
 Ciphers aes128-gcm@openssh.com
 HostbasedAcceptedAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com
 HostKeyAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com
