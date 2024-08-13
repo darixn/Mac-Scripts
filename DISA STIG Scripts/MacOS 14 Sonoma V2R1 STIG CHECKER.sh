@@ -4,7 +4,7 @@
 # MacOS 14 (SONOMA) V2R1 STIG CHECKER
 #
 # Purpose: Checks the requires DISA STIGS against the machines current settings
-# 
+#
 # To run script open terminal and type 'sudo bash /path/to/script.sh'
 #
 # https://github.com/cocopuff2u
@@ -29,7 +29,7 @@ STIG_VERSION="MACOS 14 (SONOMA) V2R1" # [ Do Not Adjust ]
 # Script Log Location [ /var/log/yourcompany_Passed_STIG_Scan.log ]
 PASS_LOG_FILE="/var/log/Passed_STIG_Scan.log"
 FAILURE_LOG_FILE="/var/log/Failed_STIG_Scan.log"
-SINGLE_LOG_FILE="/var/log/Complete_STIG_Scan.log" 
+SINGLE_LOG_FILE="/var/log/Complete_STIG_Scan.log"
 COMMAND_LOG_FILE="/var/log/Command_STIG.log"
 PLIST_FILE="/Library/Preferences/STIG_Checks.plist"
 
