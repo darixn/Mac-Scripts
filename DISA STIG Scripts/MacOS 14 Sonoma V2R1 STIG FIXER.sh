@@ -2550,7 +2550,7 @@ execute_and_log "$check_name" "$command" "$expected_result" "$simple_name" "$fix
 
 ##############################################
 check_name="V-259559"
-simple_name="System_Log_Retention_To_365"
+simple_name="Configure_Sudoers_Timestamp_Type"
 command="/usr/bin/sudo /usr/bin/sudo -V | /usr/bin/awk -F\": \" '/Type of authentication timestamp record/{print \$2}'"
 expected_result="tty"
 fix_command="/usr/bin/find /etc/sudoers* -type f -exec sed -i '' '/timestamp_type/d; /!tty_tickets/d' '{}' \;"
